@@ -2,7 +2,7 @@
 
 `pip install -r requirements.txt`
 
-### nTo run scripts
+### To run scripts
 
 `python python_filename.py`
 
