@@ -1,0 +1,32 @@
+{% load static %}
+{% block content %}
+<div id="loading">
+    <h2>Loading data for {{ Name }}...</h2>
+    <img src="{% static 'users/images/lg.gif' %}" alt="Loading...">
+</div>
+
+<div id="content" style="display: none;">
+    <!-- This will be populated with the user data -->
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $.ajax({
+            url: "{% url 'test' %}",
+            type: "POST",
+            headers: {
+                "X-CSRFToken": "{% csrf_token %}"
+            },
+            dataType: "json",
+            success: function(data) {
+                $("#loading").hide();
+                $("#content").html(data.UserData).show();
+            },
+            error: function() {
+                $("#loading").html("<p>An error occurred. Please try again later.</p>");
+            }
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends 'users/base.html' %}
+{% load static %}
+{% block content %}
+
+<div class="container">
+    
+    <div class="heading-text heading-line text-center mt-5">
+        <h4>Slide Quality Checker</h4>
+    </div>
+
+    <div class="line"></div>
+
+    <div class="row team-members team-members-card m-b-40">
+        <div class="col-lg-4">
+            <div class="team-member">
+
+                <div class="team-desc my-3">
+                    <h3></h3>
+                    <p></p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="team-member">
+                <div class="team-desc my-3">
+                    <h3>Grammar & visibility Checker</h3>
+                    <p>Will find each sentence in a text, look up each word in the dictionary</p>
+                    <a href="{% url 'grammer' %}" class="btn btn-outline btn-rounded">Check</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="team-member">
+                <div class="team-desc my-3">
+                    <h3></h3>
+                    <p></p>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+{% endblock content %}

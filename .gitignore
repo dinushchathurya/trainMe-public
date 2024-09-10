@@ -1,0 +1,13 @@
+users/__pycache__/
+trainme/__pycache__/
+users/*/__pycache__/
+trainme/*/__pycache__/
+media/*/
+users/models/grammermodels/pytorch_model.bin
+users/models/audio_emotion/model.safetensors
+
+users/models/output.wav
+users/myprosody/dataset/audioFiles/
+
+
+.vscode/

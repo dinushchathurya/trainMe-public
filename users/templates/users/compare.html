@@ -1,0 +1,180 @@
+{% extends 'users/base.html' %}
+{% load static %}
+{% block content %}
+
+<style>
+    .video-wrap {
+        position: relative;
+        padding-bottom: 56.25%;
+        /* 16:9 aspect ratio */
+        height: 0;
+        overflow: hidden;
+    }
+
+    .video-wrap video {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
+    .comparison-container {
+        display: flex;
+        justify-content: space-between;
+    }
+    .column {
+        width: 100%;
+    }
+</style>
+<div class="container">
+    <nav aria-label="breadcrumb mt-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'history' %}">History</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Compare</li>
+        </ol>
+    </nav>
+
+    <div class="card text-center mt-5 shadow-lg p-3 bg-white rounded" style="width: 90%;margin: auto;">
+        <h4 class="card-title mb-0" id="video-title"></h4>
+        <div id="video-content" class="comparison-container"></div>
+    </div>
+
+    <div class="card text-center mt-5 shadow-lg p-3 bg-white rounded" style="width: 90%;margin: auto;">
+        <h4 class="card-title mb-0" id="ppt-title"></h4>
+        <div id="ppt-content" class="comparison-container"></div>
+    </div>
+</div>
+<script id="django-data" type="application/json"> {{ data|safe }} </script>
+<script>
+    function displayData(data) {
+        console.log(data);
+        if ("pptx" in data.column_1) {
+            const contentDiv = document.getElementById('ppt-content');
+            const title = document.getElementById("ppt-title");
+            title.innerText = "Compare Presentations: ".concat(data.column_1.pptx).concat(" vs ").concat(data.column_2.pptx);
+
+            let originalHtml = '<div class="column">';
+            let correctedHtml = '<div class="column">';
+
+            originalHtml += `<h5 class="mt-4">${data.column_1.pptx}</h5>`;
+            correctedHtml += `<h5 class="mt-4">${data.column_2.pptx}</h5>`;
+
+            for (const pageNum of Object.keys(data.column_1.grammar)) {
+                const originalContent = data.column_1.grammar[pageNum];
+                originalHtml += `
+                    <div class="card mb-3">
+                        <div class="card-header">Page ${pageNum}</div>
+                        <div class="card-body">
+                            <h6 class="card-title">${originalContent.title}</h6>
+                            <p class="card-text">${originalContent.body}</p>
+                        </div>
+                    </div>
+                `;
+
+                const correctedContent = data.column_1.grammar[pageNum];
+                correctedHtml += `
+                        <div class="card mb-3">
+                            <div class="card-header">Page ${pageNum}</div>
+                            <div class="card-body">
+                                <h6 class="card-title">${correctedContent.title}</h6>
+                                <p class="card-text">${correctedContent.body}</p>
+                            </div>
+                        </div>
+                `;
+            }
+
+            originalHtml += '</div>';
+            correctedHtml += '</div>';
+
+            contentDiv.innerHTML = originalHtml + correctedHtml;
+        }
+        else if ("video" in data.column_1){
+            const contentDiv = document.getElementById('video-content');
+            const title = document.getElementById("video-title");
+            title.innerText = "Compare Presentation: ".concat(data.column_1.video).concat(" vs ").concat(data.column_2.video);
+
+            let originalHtml = '<div class="column">';
+            let correctedHtml = '<div class="column">';
+
+            originalHtml += `<h5 class="mt-4">${data.column_1.video}</h5>`;
+            correctedHtml += `<h5 class="mt-4">${data.column_2.video}</h5>`;
+            for (const attr of Object.keys(data.column_1)) {
+                if (attr != "video" && attr != "grammar"){
+                    // const originalContent = data.column_1.grammar[pageNum];
+                    originalHtml += `
+                            <div class="card mb-3">
+                            <div class="card-header">${attr}</div>`
+                    for (const [key, value] of Object.entries(data.column_1[attr])){
+                            console.log(`Expression: ${key}, Value: ${value}`)
+                            originalHtml += `<div class="card-body">
+                                    <h6 class="card-title">${key}</h6>
+                                    <p class="card-text">${value}</p>
+                                </div>
+                        `;
+                    }
+                    originalHtml += `</div>`
+                }
+                else if (attr === "grammar"){
+                    originalHtml += `
+                            <div class="card mb-3">
+                            <div class="card-header">${attr}</div>
+                            <div class="card-body">
+                                <h6 class="card-title">Corrected</h6>
+                                <p class="card-text">${data.column_1[attr].result}</p>
+                            </div>
+                            </div>`
+                }
+            }
+
+            for (const attr of Object.keys(data.column_2)) {
+                if (attr != "video" && attr != "grammar"){
+                    // const originalContent = data.column_1.grammar[pageNum];
+                    correctedHtml += `
+                            <div class="card mb-3">
+                            <div class="card-header">${attr}</div>`
+                    for (const [key, value] of Object.entries(data.column_2[attr])){
+                            console.log(`Expression: ${key}, Value: ${value}`)
+                            correctedHtml += `<div class="card-body">
+                                    <h6 class="card-title">${key}</h6>
+                                    <p class="card-text">${value}</p>
+                                </div>
+                        `;
+                    }
+                    correctedHtml += `</div>`
+                }
+                else if (attr === "grammar"){
+                    correctedHtml += `
+                            <div class="card mb-3">
+                            <div class="card-header">${attr}</div>
+                            <div class="card-body">
+                                <h6 class="card-title">Corrected</h6>
+                                <p class="card-text">${data.column_2[attr].result}</p>
+                            </div>
+                            </div>`
+                }
+            }
+
+            originalHtml += '</div>';
+            correctedHtml += '</div>';
+
+            contentDiv.innerHTML = originalHtml + correctedHtml;
+        }
+        else {
+            const contentDiv = document.getElementById('content');
+            contentDiv.innerHTML = `<div class="video-item", id="no-ppt" style="display: none;">
+                                        <h2 class="mb-3">No presentation feedbacks.</h2>
+                                        <div class="video-wrap m-b-20"></div>
+                                    </div>`
+        }
+
+    }
+
+    // Assuming the data is passed from Django as a JSON string in a script tag
+    const dataElement = document.getElementById('django-data');
+    if (dataElement) {
+        const djangoData = JSON.parse(dataElement.textContent);
+        displayData(djangoData);
+    }
+</script>
+{% endblock content %}
